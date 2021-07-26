@@ -2,11 +2,9 @@ const User = require("./../models/User");
 const bcrypt = require("bcrypt");
 const auth = require("../auth");
 
-// router.post("/login", userController.loginUser);
-// router.post("/logout", userController.loginUser);
-// router.post("/register",  userController.registerUser);
-// router.get("/details", auth.verify, userController.getDetails);
-
+module.exports.getAllUsers = (req, res) => {
+  return true;
+}
 
 //CHECK IF EMAIL EXISTS
 this.checkEmailExists = (thisEmail) => {
@@ -20,7 +18,7 @@ this.checkEmailExists = (thisEmail) => {
 //hashSync is a funtion of bcrypt that encrypts the password and the 10 is a number of times it runs the encryption
 
 module.exports.registerUser = (req, res) => {
-  checkEmailExists(req.body.email).then( result => {
+  this.checkEmailExists(req.body.email).then( result => {
     if (!result) {
       let newUser = new User(req.body);
       newUser.password = bcrypt.hashSync(req.body.password, 10);
@@ -68,7 +66,7 @@ module.exports.loginUser = (req, res) => {
 //   });
 // };
 
-module.exports.getProfile = (req, res) => {
+module.exports.getDetails = (req, res) => {
   // console.log(req);
   // const token = req.headers.authorization;
   const userData = auth.decode(req.headers.authorization)

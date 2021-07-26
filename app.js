@@ -1,8 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const orderRoutes = require("./routes/orderRoutes");
-// const productRoutes = require("./routes/productRoutes");
-// const userRoutes = require("./routes/userRoutes");
+const productRoutes = require("./routes/productRoutes");
+const userRoutes = require("./routes/userRoutes");
 const cors = require("cors"); // allow sites to connect to this server
 const app = express();
 //const port = process.env.PORT || 8000;
@@ -34,9 +34,9 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, useCr
       // see under ./models/
 
     //routes
-    // app.use("/api/users", userRoutes);
-    // app.use("/api/products", productRoutes);
-    // app.use("/api/orders", orderRoutes);
+    app.use("/api/users", userRoutes);
+    app.use("/api/products", productRoutes);
+    app.use("/api/orders", orderRoutes);
 
     // 200 0K
     // 201 created

@@ -12,7 +12,7 @@ module.exports.createAccessToken = (user) => {
 	return jwt.sign(data, secret, {});
 };
 
-module.exports.isAdmin = (req, res, next) => {
+module.exports.requireAdmin = (req, res, next) => {
   let token = req.headers.authorization;
 	
 	let payload = module.exports.decode(token);
