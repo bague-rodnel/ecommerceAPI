@@ -23,8 +23,7 @@ const orderSchema = new mongoose.Schema({
       }
     }
   ], 
-  
-  // array of products
+  // array of product IDs
   products: [
     {
       productID: {

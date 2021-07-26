@@ -19,7 +19,7 @@ module.exports.requireAdmin = (req, res, next) => {
 	if (payload.isAdmin) {
 		next();
 	} else {
-		return res.send({auth: "failed"});
+		res.status(403).send({ error: "This operation is forbidden" });
 	}
 }
 
@@ -31,15 +31,16 @@ module.exports.verify = (req, res, next) => {
   	// token = token.slice(7, token.length); 
   	token = token.split(' ')[1];
 
-  	return jwt.verify(token, secret, (err, data) => {
+  	return jwt.verify(token, secret, (err, decoded) => {
   		if (err) {
-  			return res.send({auth: "failed"});
+  			return res.status(401).send({ error: "Authentication failed." });
   		} else {
+        req.isAdmin = decoded.isAdmin; // probably useful later
   			next(); 
   		}
   	});
   } else {
-  	return res.send({auth: "failed"});
+  	return res.status(401).send({ error: "Authentication failed." });
   }
 };
 
@@ -53,7 +54,10 @@ module.exports.decode = (token) => {
 				return null;
 			} else {
 				let payload = jwt.decode(token, {complete: true}).payload;
+
+        console.log("[DEBUG] auth.js > decode()");
 				console.log(payload);
+
 				return payload;
 				// decode() decodes the token and gets the payload
 				// payload is the data from the token we initially
