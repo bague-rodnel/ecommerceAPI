@@ -6,7 +6,7 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Total amount is required"]
   },
-  purchsedOn: {
+  purchasedOn: {
     type: Date,
     default: new Date()
   },
@@ -35,4 +35,3 @@ const orderSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model("Order", orderSchema);
-

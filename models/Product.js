@@ -6,6 +6,11 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: [true, "Product name is required"]
   },
+  sku: {
+    type: String,
+    required: [true, "Product SKU is required."]
+    //unique: ill deal with this later
+  },
   description: {
     type: String,
     required: [true, "Product description is required"]
@@ -36,5 +41,5 @@ const productSchema = new mongoose.Schema({
   ]
 });
 
-module.exports= mongoose.model("Product", productSchema);
+module.exports = mongoose.model( "Product" , productSchema );
 

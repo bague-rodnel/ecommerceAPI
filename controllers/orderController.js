@@ -1,87 +1,58 @@
-const User = require("./../models/User");
-const bcrypt = require("bcrypt");
-const auth = require("../auth");
+const Order = require( "./../models/Order" );
+const Product = require( "./../models/Product" );
+const User = require( "./../models/User" );
+const auth = require( "../auth" );
 
 
-module.exports.getAllOrders = () => {
-
-}
-
-module.exports.getOrderDetails = () => {
-
-}
-
-module.exports.checkoutOrder = () => {
-
-}
-
-//CHECK IF EMAIL EXISTS
-module.exports.checkEmailExists = (thisEmail) => {
-  return User.findOne({ email: thisEmail }).then((result) => {
-    return result;
+module.exports.getAllOrders = ( req, res ) => {
+  Order.find( {} ).then( ( result, error ) => {
+    if ( error ) {
+      res.status( 500 ).send( { error: error } );
+    } else {
+      res.status( 200 ).send( result );
+    }
   })
-};
+}
 
-//REGISTER USER
-//to hash the password: https://www.npmjs.com/package/bcrypt
-//hashSync is a funtion of bcrypt that encrypts the password and the 10 is a number of times it runs the encryption
+module.exports.getLoggedUserOrders = ( req, res ) => {
+  let userData = auth.decode( req.headers.authorization );
+  let userOrders = [];
 
-module.exports.registerUser = (req, res) => {
-  this.checkEmailExists(req.body.email).then( result => {
-    if (!result) {
-      let newUser = new User(req.body);
-      newUser.password = bcrypt.hashSync(req.body.password, 10);
-
-      return newUser.save().then(( result, err ) => {
-        if(err){
-          res.send(err);
-        } else {
-          result.password = "********";
-          res.send(result);
-        }
+  // console.log("[DEBUG] orderController.js > getLoggedUserORders()")
+  // console.log(userDetails);
+  User.findById( userData.id ).then( foundUser => {
+    if ( foundUser ) {
+      foundUser.orders.forEach( orderID => {
+        Order.findById( orderID ).then( foundOrder => {
+          userOrders.push( foundOrder );
+        });
       })
+    
+      res.status( 200 ).send( userOrders );
     } else {
-      res.send("email already registered.");
+      res.status( 404 ).send( { order: "User info not found." } );
     }
-  });
+  })
 }
 
+module.exports.createOrder = async ( req, res ) => {
+  // let isOrderSaved, isBuyerLinked, isProductLinked = false;
 
-//USER LOGIN
-  //- we use email and password
-  //- once we login, we will produce token
-  //- compareSync - compare password from user and database
+  // let newOrder = new Order( req.body );
+  // isOrderSaved = await newOrder.save()
+  // .then( ( order , err ) => {
+  //   if ( err ) {
+  //     res.status( 500 ).send( { error: err } );
+  //   }
 
-module.exports.loginUser = (req, res) => {
-  this.checkEmailExists(req.body.email).then( result => {
-    if(!result){
-      res.send(false); //User doesn't exist
-    } else {
-      console.log("found email");
-      const isPasswordCorrect = bcrypt.compareSync(req.body.password, result.password); //returns boolean
-      if(isPasswordCorrect){
-        res.send({access: auth.createAccessToken(result)});
-      } else {
-        res.send(false); //password didn't match
-      } 
-    }
-  });
-}
+    
+  // })
+  // .then( ( result, err ) => {
+  // })
 
-// module.exports.getProfile = (data) => {
-//   return User.findById(data.userId).then( result => {
-//     result.password = "********";
-//     return result;
-//   });
-// };
-
-module.exports.getProfile = (req, res) => {
-  // console.log(req);
-  // const token = req.headers.authorization;
-  const userData = auth.decode(req.headers.authorization)
-
-  return User.findById(userData.id).then( result => {
-    result.password = "********";
-    res.send(result);
-  });
+  // if ( isOrderSaved && isBuyerLinked && isProductLinked ) {
+  //   res.status( 201 ).send( "Order created and records are synced." );
+  // } else {
+  //   res.status( 500 ).send( { error: err } );
+  // }
 }

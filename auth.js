@@ -55,8 +55,8 @@ module.exports.decode = (token) => {
 			} else {
 				let payload = jwt.decode(token, {complete: true}).payload;
 
-        console.log("[DEBUG] auth.js > decode()");
-				console.log(payload);
+        // console.log("[DEBUG] auth.js > decode()");
+				// console.log(payload);
 
 				return payload;
 				// decode() decodes the token and gets the payload

@@ -18,4 +18,24 @@ module.exports = router;
 /* 
   get /me ,logged in user 
   get /:userID, admin only
+
+DATA MODEL DESIGN
+
+
+--- E-commerce API MVP requirements ---
+ - User registration
+ - User authentication
+ - Set user as admin (Admin only)
+
+ - Retrieve all active products
+ - Retrieve single product
+- Create Product (Admin only)
+- Update Product information (Admin only)
+- Archive Product (Admin only)
+
+- Non-admin User checkout (Create Order)
+- Retrieve authenticated user’s orders
+- Retrieve all orders (Admin only)
+
+
 */
