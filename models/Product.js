@@ -21,7 +21,19 @@ const productSchema = new mongoose.Schema({
   createdOn: {
     type: Date,
     default: new Date()
-  }
+  },
+
+  // Must be associated with:
+  // A user who owns the order
+  // Products that belong to the order 
+  orders: [
+    {
+      orderId: {
+        type: String,
+        required: [true, "Order ID is required."]
+      }
+    }
+  ]
 });
 
 module.exports= mongoose.model("Product", productSchema);

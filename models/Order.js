@@ -2,26 +2,37 @@ const mongoose = require("mongoose");
 
 
 const orderSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Product name is required"]
-  },
-  description: {
-    type: String,
-    required: [true, "Product description is required"]
-  },
-  price: {
+  totalAmount: {
     type: Number,
-    required: [true, "Product price is required"]
+    required: [true, "Total amount is required"]
   },
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-  createdOn: {
+  purchsedOn: {
     type: Date,
     default: new Date()
-  }
+  },
+  // Must be associated with:
+  // A user who owns the order
+  // Products that belong to the order 
+
+  // array of user IDs
+  buyers: [
+    {
+      userID: {
+        type: String,
+        required: [true, "Buyer ID is required."]
+      }
+    }
+  ], 
+  
+  // array of products
+  products: [
+    {
+      productID: {
+        type: String,
+        required: [true, "Product ID is required."]
+      }
+    }
+  ]
 });
 
 module.exports = mongoose.model("Order", orderSchema);
