@@ -1,0 +1,14 @@
+DATA MODEL DESIGN
+
+e-commerce API MVP requirements
+
+user registration
+user authentication
+set user as admin (admin only)
+retrieve all active products
+retrieve single product
+create product (admin only)
+update product information (admin only)
+non-admin user checkout (create order)
+retrieve authenticated user's orders
+retrieve all orders (admin only)
