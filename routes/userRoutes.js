@@ -4,14 +4,15 @@ const userController = require("../controllers/userController");
 const auth = require("../auth");
 
 router.get("/all", auth.verify, auth.requireAdmin, userController.getAllUsers);
+router.get("/me", auth.verify, userController.getLoggedUserInfo);
+router.put("/me", auth.verify, userController.updateLoggedUserInfo);
+router.post("/login", userController.loginUser);
+router.post("/register", userController.registerUser);
 
+router.put("/:userID/makeAdmin", auth.verify, auth.requireAdmin, userController.makeUserAdmin);
 router.get("/:userID", auth.verify, auth.requireAdmin, userController.getUserByID);
 router.put("/:userID", auth.verify, auth.requireAdmin, userController.updateUserByID);
 
-router.get("/me", auth.verify, userController.getLoggedUserInfo);
-router.put("/me", auth.verify, userController.getLoggedUserInfo);
-router.post("/login", userController.loginUser);
-router.post("/register", userController.registerUser);
 
 module.exports = router;
 

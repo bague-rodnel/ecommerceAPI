@@ -4,9 +4,9 @@ const productController = require("../controllers/productController");
 const auth = require("../auth");
 
 router.get("/all", productController.getAllProducts);
+router.post("/create", auth.verify, auth.requireAdmin, productController.createProduct);
 router.get("/:productID", productController.getProductDetails);
 router.put("/:productID", auth.verify, auth.requireAdmin, productController.updateProductByID);
-router.post("/create", auth.verify, auth.requireAdmin, productController.createProduct);
 router.put("/archive/:productID", auth.verify, auth.requireAdmin, productController.productArchive); 
 router.put("/unarchive/:productID", auth.verify, auth.requireAdmin, productController.productUnarchive); 
 

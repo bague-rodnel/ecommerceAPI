@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const Product = require( "./../models/Product" );
 
 const orderSchema = new mongoose.Schema({
   totalAmount: {
@@ -14,15 +14,11 @@ const orderSchema = new mongoose.Schema({
   // A user who owns the order
   // Products that belong to the order 
 
-  // array of user IDs
-  buyers: [
-    {
-      userID: {
-        type: String,
-        required: [true, "Buyer ID is required."]
-      }
-    }
-  ], 
+  // only one buyer ID is needed 
+  buyerID: {
+    type: String,
+    default: "-1"    // guest
+  },
   // array of product IDs
   products: [
     {
@@ -33,5 +29,18 @@ const orderSchema = new mongoose.Schema({
     }
   ]
 });
+
+// orderSchema.pre('save', function(next) {
+//   let total = 0;
+
+//   this.products.forEach( productID => {
+//     Product.findById( productID ).then( foundProduct => {
+//       total += foundProduct.price;
+//     })
+//   });
+
+//   this.totalAmount = total;
+//   next();
+// });
 
 module.exports = mongoose.model("Order", orderSchema);

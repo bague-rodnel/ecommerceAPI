@@ -1,6 +1,12 @@
 const jwt = require("jsonwebtoken");
 const secret = "CourseBookingAPI";
 
+// DEbugging
+module.exports.passCheck = ( req, res, next ) => {
+  console.log("[DEBUG], passed previous middleware()");
+  next();
+}
+
 // create token
 module.exports.createAccessToken = (user) => {
 	const data = {

@@ -2,6 +2,14 @@ const User = require( "./../models/User" );
 const bcrypt = require( "bcrypt" );
 const auth = require( "../auth" );
 
+
+//CHECK IF EMAIL EXISTS
+this.findByEmail = ( thisEmail ) => {
+  return User.findOne( { email: thisEmail } ).then( ( result ) => {
+    return result;
+  })
+};
+
 module.exports.getAllUsers = ( req, res ) => {
   User.find( {} ).then( ( result, error ) => {
     if ( error ) {
@@ -10,14 +18,11 @@ module.exports.getAllUsers = ( req, res ) => {
       res.status( 200 ).send( result );
     }
   })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+  })
 }
 
-//CHECK IF EMAIL EXISTS
-this.findByEmail = ( thisEmail ) => {
-  return User.findOne( { email: thisEmail } ).then( ( result ) => {
-    return result;
-  })
-};
 
 //REGISTER USER
 //to hash the password: https://www.npmjs.com/package/bcrypt
@@ -37,10 +42,16 @@ module.exports.registerUser = ( req, res ) => {
           res.status( 201 ).send( result );
         }
       })
+      .catch( error => {
+        res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+      })
     } else {
       res.status( 409 ).send( { error: "Email is already in use." } );
     }
-  });
+  })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+  })
 }
 
 module.exports.loginUser = ( req, res ) => {
@@ -55,7 +66,10 @@ module.exports.loginUser = ( req, res ) => {
         res.status( 401 ).send( { error: "email/password is not correct" } ); //password didn't match
       } 
     }
-  });
+  })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+  })
 }
 
 module.exports.getLoggedUserInfo = ( req, res ) => {
@@ -68,7 +82,25 @@ module.exports.getLoggedUserInfo = ( req, res ) => {
     } else {
       res.status( 404 ).send( { error: "User not found." } );
     }
-  });
+  })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+  })
+}
+
+module.exports.updateLoggedUserInfo = ( req, res ) => {
+  let userData = auth.decode( req.headers.authorization );
+
+  User.findByIdAndUpdate( userData.id, req.body, { new: true } ).then( result => {
+    if ( result ) {
+      res.status( 200 ).send( result );
+    } else {
+      res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+    }
+  })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+  })
 }
 
 module.exports.getUserByID = ( req, res ) => {
@@ -82,6 +114,9 @@ module.exports.getUserByID = ( req, res ) => {
       res.status( 404 ).send( { error: "User not found." } );
     }
   })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+  })
 }
 
 module.exports.updateUserByID = ( req, res ) => {
@@ -91,7 +126,26 @@ module.exports.updateUserByID = ( req, res ) => {
     if ( result ) {
       res.status( 200 ).send( result );
     } else {
-      res.status( 500 ).send( { error: "Unable to process update." } );
+      res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
     }
+  })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+  })
+}
+
+// router.put("/:userID/makeAdmin"
+module.exports.makeUserAdmin = ( req, res ) => {
+  let userID = req.params.userID;
+
+  User.findByIdAndUpdate( userID, { isAdmin: true }, {new: true} ).then( result => {
+    if ( result ) {
+      res.status( 200 ).send( result );
+    } else {
+      res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+    }
+  })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
   })
 }

@@ -8,7 +8,7 @@ const app = express();
 const port = process.env.PORT || 8000;
 
 const dbURI = 'mongodb+srv://rodnelb:toor@zuitt-bootcamp.pfukx.mongodb.net/ecommerce-api?retryWrites=true&w=majority';
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex:true, useFindAndModify: true })
+mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex:true, useFindAndModify: false })
 .then((result) => {
   if (result) {
     console.log('Connected to MongoDB database.');
@@ -27,9 +27,9 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, useCr
       // see under ./models/
 
     //routes
-    app.use("/api/users", userRoutes);
-    app.use("/api/products", productRoutes);
     app.use("/api/orders", orderRoutes);
+    app.use("/api/products", productRoutes);
+    app.use("/api/users", userRoutes);
 
     // 200 0K
     // 201 created

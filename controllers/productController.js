@@ -15,6 +15,9 @@ module.exports.getAllProducts = ( req, res ) => {
       res.status( 200 ).send( result );
     }
   })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+  })
 }
 
 module.exports.getProductDetails = ( req, res ) => {
@@ -26,6 +29,9 @@ module.exports.getProductDetails = ( req, res ) => {
     } else {
       res.status( 404 ).send( { error: "Product not found." } );
     }
+  })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
   })
 }
 
@@ -47,9 +53,8 @@ module.exports.createProduct = ( req, res ) => {
     }
   })
   .catch( error => {
-    console.log("there was an error saving new prOduct");
-    res.status( 409 ).send( { error: error } );
-  });
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+  })
 }
 
 module.exports.updateProductByID = ( req, res ) => {
@@ -59,8 +64,11 @@ module.exports.updateProductByID = ( req, res ) => {
     if ( result ) {
       res.status( 200 ).send( result );
     } else {
-      res.status( 500 ).send( { error: "Unable to process update." } );
+      res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
     }
+  })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
   })
 }
 
@@ -71,8 +79,11 @@ module.exports.productArchive = ( req, res ) => {
     if ( result ) {
       res.status( 200 ).send( result );
     } else {
-      res.status( 500 ).send({ error: "Unable to process update." })
+      res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
     }
+  })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
   })
 }
 
@@ -83,7 +94,10 @@ module.exports.productUnarchive = ( req, res ) => {
     if ( result ) {
       res.status( 200 ).send( result );
     } else {
-      res.status( 500 ).send({ error: "Unable to process update." })
+      res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
     }
+  })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
   })
 }
