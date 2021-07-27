@@ -33,7 +33,7 @@ const productSchema = new mongoose.Schema({
   // Products that belong to the order 
   orders: [
     {
-      orderId: {
+      orderID: {
         type: String,
         required: [true, "Order ID is required."]
       }

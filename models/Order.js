@@ -30,17 +30,4 @@ const orderSchema = new mongoose.Schema({
   ]
 });
 
-// orderSchema.pre('save', function(next) {
-//   let total = 0;
-
-//   this.products.forEach( productID => {
-//     Product.findById( productID ).then( foundProduct => {
-//       total += foundProduct.price;
-//     })
-//   });
-
-//   this.totalAmount = total;
-//   next();
-// });
-
 module.exports = mongoose.model("Order", orderSchema);

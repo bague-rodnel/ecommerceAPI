@@ -10,9 +10,8 @@ router.post("/login", userController.loginUser);
 router.post("/register", userController.registerUser);
 
 router.put("/:userID/makeAdmin", auth.verify, auth.requireAdmin, userController.makeUserAdmin);
-router.get("/:userID", auth.verify, auth.requireAdmin, userController.getUserByID);
 router.put("/:userID", auth.verify, auth.requireAdmin, userController.updateUserByID);
-
+router.get("/:userID", auth.verify, auth.requireAdmin, userController.getUserByID);
 
 module.exports = router;
 

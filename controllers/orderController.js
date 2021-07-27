@@ -21,8 +21,6 @@ module.exports.getLoggedUserOrders = ( req, res ) => {
   let userData = auth.decode( req.headers.authorization );
   let userOrders = [];
 
-  // console.log("[DEBUG] orderController.js > getLoggedUserORders()")
-  // console.log(userDetails);
   User.findById( userData.id ).then( foundUser => {
     if ( foundUser ) {
       foundUser.orders.forEach( orderID => {
@@ -59,47 +57,31 @@ module.exports.createOrder = ( req, res ) => {
 
   //  then save new order() retrieve the saved order's _id
   let newOrderID = newOrder.save()
-  // console.log("[DEBUG] createOrder()", newOrderID);
   .then( saveResult => {
     console.log("[DEBUG] createOrder() saveResult", saveResult);
 
     // push this order _id to buyer.orders[]
-    User.findByIdAndUpdate( newOrder.buyerID, { $push: { "orders": { orderID: saveResult._id } }}, { new: true } ).then( result => {
-      if (result) {
-        res.status(201).send("New order created.");
-      } else {
-        res.status(500).send({ error: "Internal server error. Can't process your request."});
-      }
-    });
+    User.findByIdAndUpdate( newOrder.buyerID, { $push: { "orders": { orderID: saveResult._id } }}, { new: true } )
 
     // get products list and get Total > update total amount
-    // newOrder.products.forEach( (productObj) => {
-    //   // newOrder.totalAmount += Product.findById( productObj.productID ).price;
-    //   Product.findById( productObj.productID ).then( foundProduct => {
-    //     // console.log("[DEBUG] createOrder() findById result", result);
-    //     newOrder.totalAmount += foundProduct.price;
+    Promise.all(
+      newOrder.products.map( (productObj) => {
+        // push this order _id to product.orders[]
+        return Product.findByIdAndUpdate( productObj.productID, { $push: { "orders": { orderID: saveResult._id } }} ).then( foundProduct => {
 
-    //     // push this order _id to product.orders[]
-    //     foundProduct.orders.push({ orderID: newOrderID });
-    //   })
-    // })
-    // console.log("[DEBUG] createOrder() totalAmount", newOrder);
+          return foundProduct.price; // mapping price for totals later
+        })
+      })
+    )
+    .then(( mappedPrices ) => { // mapped Promises resolved into mapped prices
+      newOrder.totalAmount = mappedPrices.reduce( (runningSum, currentPrice) => runningSum + currentPrice);
+      return newOrder.save();
+    })
+    .then( result => {
+      res.status(201).send(" New order created. Records synced. ");
+    })
+    .catch( error => {
+      res.status(500).send({ error: "Internal server error. Can't process your request." });
+    })
   });
-
-
-
-  
-  // isOrderSaved = await newOrder.save()
-  // .then( ( result, err ) => {
-  //   if ( err ) {
-  //     return false
-  //   }
-  //   return result;
-  // })
-  // // if ( isOrderSaved && isBuyerLinked && isProductLinked ) {
-  // if ( isOrderSaved ) {
-  //   res.status( 201 ).send( "Order created and records are synced." );
-  // } else {
-  //   res.status( 500 ).send( { error: err } );
-  // }
 }

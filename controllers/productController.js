@@ -53,7 +53,7 @@ module.exports.createProduct = ( req, res ) => {
     }
   })
   .catch( error => {
-    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request.", details: error } );
   })
 }
 
