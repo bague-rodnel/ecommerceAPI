@@ -17,19 +17,15 @@ module.exports.getAllOrders = ( req, res ) => {
   })
 }
 
+// this method will only return the orderIDs
+// a separate /api/orders/:orderID will return the details
 module.exports.getLoggedUserOrders = ( req, res ) => {
   let userData = auth.decode( req.headers.authorization );
   let userOrders = [];
 
   User.findById( userData.id ).then( foundUser => {
     if ( foundUser ) {
-      foundUser.orders.forEach( orderID => {
-        Order.findById( orderID ).then( foundOrder => {
-          userOrders.push( foundOrder );
-        });
-      })
-    
-      res.status( 200 ).send( userOrders );
+      res.status( 200 ).send( foundUser.orders );
     } else {
       res.status( 404 ).send( { order: "User info not found." } );
     }
@@ -78,10 +74,25 @@ module.exports.createOrder = ( req, res ) => {
       return newOrder.save();
     })
     .then( result => {
-      res.status(201).send(" New order created. Records synced. ");
+      res.status( 201 ).send( " New order created. Records synced. " );
     })
     .catch( error => {
-      res.status(500).send({ error: "Internal server error. Can't process your request." });
+      res.status( 500 ).send({ error: "Internal server error. Cannot process your request." });
     })
+  });
+}
+
+module.exports.getOrderDetails = ( req, res ) => {
+  let orderID = req.params.orderID;
+
+  Order.findById( orderID ).then( foundOrder => {
+    if ( foundOrder ) {
+      res.status( 200 ).send( foundOrder );
+    } else {
+      res.status( 404 ).send( { error: "Order not found."} );
+    }
+  })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
   });
 }

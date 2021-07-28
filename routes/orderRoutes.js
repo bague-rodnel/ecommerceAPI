@@ -6,6 +6,7 @@ const auth = require("../auth");
 router.get("/all", auth.verify, auth.requireAdmin, orderController.getAllOrders);
 router.get("/mine", auth.verify, orderController.getLoggedUserOrders); 
 router.post("/create", auth.verify, orderController.createOrder);
+router.get("/:orderID", auth.verify, orderController.getOrderDetails);
 
 module.exports = router;
 
