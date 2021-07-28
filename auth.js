@@ -19,14 +19,11 @@ module.exports.createAccessToken = (user) => {
 };
 
 module.exports.requireAdmin = (req, res, next) => {
-  let token = req.headers.authorization;
-	
-	let payload = module.exports.decode(token);
-	if (payload.isAdmin) {
-		next();
-	} else {
-		res.status(403).send({ error: "This operation is forbidden" });
-	}
+  if (req.isAdmin) {
+    next();
+  } else {
+    res.status(403).send({ error: "This operation is forbidden" });
+  }
 }
 
 // verify token
@@ -39,14 +36,16 @@ module.exports.verify = (req, res, next) => {
 
   	return jwt.verify(token, secret, (err, decoded) => {
   		if (err) {
-  			return res.status(401).send({ error: "Authentication failed." });
+  			res.status(401).send({ error: "Authentication failed." });
+        return false;
   		} else {
         req.isAdmin = decoded.isAdmin; // probably useful later
   			next(); 
   		}
   	});
   } else {
-  	return res.status(401).send({ error: "Authentication failed." });
+  	res.status(401).send({ error: "Authentication failed." });
+    return false;
   }
 };
 

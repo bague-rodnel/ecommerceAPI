@@ -7,8 +7,9 @@ router.get("/all", productController.getAllProducts);
 router.post("/create", auth.verify, auth.requireAdmin, productController.createProduct);
 router.get("/:productID", productController.getProductDetails);
 router.put("/:productID", auth.verify, auth.requireAdmin, productController.updateProductByID);
-router.put("/archive/:productID", auth.verify, auth.requireAdmin, productController.productArchive); 
-router.put("/unarchive/:productID", auth.verify, auth.requireAdmin, productController.productUnarchive); 
+router.delete("/:productID", auth.verify, auth.requireAdmin, productController.deleteProduct); 
+router.put("/:productID/archive", auth.verify, auth.requireAdmin, productController.archiveProduct); 
+router.put("/:productID/unarchive", auth.verify, auth.requireAdmin, productController.unarchiveProduct); 
 
 
 module.exports = router;

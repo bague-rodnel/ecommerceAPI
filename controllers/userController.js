@@ -11,6 +11,7 @@ this.findByEmail = ( thisEmail ) => {
 };
 
 module.exports.getAllUsers = ( req, res ) => {
+  // console.log("[DEBUG] req.isAdmin ", req.isAdmin);
   User.find( {} ).then( ( result, error ) => {
     if ( error ) {
       res.status( 500 ).send( { error: error } );
@@ -80,7 +81,7 @@ module.exports.getLoggedUserInfo = ( req, res ) => {
       foundUser.password = "********";
       res.status( 200 ).send( foundUser );
     } else {
-      res.status( 404 ).send( { error: "User not found." } );
+      res.status( 404 ).send( { error: `User (${userData.id}) not found.` } );
     }
   })
   .catch( error => {
@@ -95,7 +96,7 @@ module.exports.updateLoggedUserInfo = ( req, res ) => {
     if ( result ) {
       res.status( 200 ).send( result );
     } else {
-      res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+      res.status( 404 ).send( { error: `User (${userData.id}) not found.` } );
     }
   })
   .catch( error => {
@@ -111,7 +112,7 @@ module.exports.getUserByID = ( req, res ) => {
       foundUser.password = "********";
       res.status( 200 ).send( foundUser );
     } else {
-      res.status( 404 ).send( { error: "User not found." } );
+      res.status( 404 ).send( { error: `User (${userID}) not found.` } );
     }
   })
   .catch( error => {
@@ -126,7 +127,7 @@ module.exports.updateUserByID = ( req, res ) => {
     if ( result ) {
       res.status( 200 ).send( result );
     } else {
-      res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+      res.status( 404 ).send( { error: `User (${userID}) not found.` } );
     }
   })
   .catch( error => {
@@ -140,9 +141,24 @@ module.exports.makeUserAdmin = ( req, res ) => {
 
   User.findByIdAndUpdate( userID, { isAdmin: true }, {new: true} ).then( result => {
     if ( result ) {
-      res.status( 200 ).send( result );
+      res.status( 200 ).send( { success: `User (${userID}) is now an admin.` } );
     } else {
-      res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+      res.status( 404 ).send( { error: `User (${userID}) not found.` } );
+    }
+  })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+  })
+}
+
+module.exports.deleteUser = ( req, res ) => {
+  let userID = req.params.userID;
+
+  User.findByIdAndDelete( userID ).then( result => {
+    if ( result ) {
+      res.status( 200 ).send( { result: `User (${userID}) is now deleted.`, deleted: result } );
+    } else {
+      res.status( 404 ).send( { error: `User (${userID}) not found.` } );
     }
   })
   .catch( error => {

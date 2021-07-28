@@ -10,6 +10,12 @@ const orderSchema = new mongoose.Schema({
     type: Date,
     default: new Date()
   },
+  addressShippedTo: {
+    type: String
+  },
+  addressBilledTo: {
+    type: String
+  },
   // Must be associated with:
   // A user who owns the order
   // Products that belong to the order 

@@ -27,7 +27,7 @@ module.exports.getLoggedUserOrders = ( req, res ) => {
     if ( foundUser ) {
       res.status( 200 ).send( foundUser.orders );
     } else {
-      res.status( 404 ).send( { order: "User info not found." } );
+      res.status( 404 ).send( { order: `User (${userData.id}) not found.` } );
     }
   })
   .catch( error => {
@@ -54,7 +54,6 @@ module.exports.createOrder = ( req, res ) => {
   //  then save new order() retrieve the saved order's _id
   let newOrderID = newOrder.save()
   .then( saveResult => {
-    console.log("[DEBUG] createOrder() saveResult", saveResult);
 
     // push this order _id to buyer.orders[]
     User.findByIdAndUpdate( newOrder.buyerID, { $push: { "orders": { orderID: saveResult._id } }}, { new: true } )
@@ -74,7 +73,7 @@ module.exports.createOrder = ( req, res ) => {
       return newOrder.save();
     })
     .then( result => {
-      res.status( 201 ).send( " New order created. Records synced. " );
+      res.status( 201 ).send( { success: " New order created. Records synced. ", result: result } );
     })
     .catch( error => {
       res.status( 500 ).send({ error: "Internal server error. Cannot process your request." });
@@ -95,4 +94,15 @@ module.exports.getOrderDetails = ( req, res ) => {
   .catch( error => {
     res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
   });
+}
+
+module.exports.deleteOrder = ( req, res ) => {
+  let orderID = req.params.orderID;
+
+  Product.findByIdAndDelete( orderID ).then( result => {
+    res.status( 200 ).send( { success: `Order (${orderID}) is now deleted.`, deleted: result } );
+  })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+  })
 }

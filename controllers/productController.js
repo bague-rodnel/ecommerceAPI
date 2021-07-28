@@ -8,7 +8,13 @@ this.findBySKU = ( thisSKU ) => {
 };
 
 module.exports.getAllProducts = ( req, res ) => {
-  Product.find( {} ).then( ( result, error ) => {
+  let showActiveOnly = true;
+
+  if (req.isAdmin && (req.body.isActive == "false") ) {
+    showActiveOnly = false;
+  }
+
+  Product.find( { isActive : showActiveOnly } ).then( ( result, error ) => {
     if ( error ) {
       res.status( 500 ).send( { error: error } );
     } else {
@@ -27,7 +33,7 @@ module.exports.getProductDetails = ( req, res ) => {
     if ( foundProduct ) {
       res.status( 200 ).send( foundProduct );
     } else {
-      res.status( 404 ).send( { error: "Product not found." } );
+      res.status( 404 ).send( { error: `Product (${productID}) not found.` } );
     }
   })
   .catch( error => {
@@ -64,7 +70,7 @@ module.exports.updateProductByID = ( req, res ) => {
     if ( result ) {
       res.status( 200 ).send( result );
     } else {
-      res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+      res.status( 404 ).send( { error: `Product (${productID}) not found.` } );
     }
   })
   .catch( error => {
@@ -72,14 +78,14 @@ module.exports.updateProductByID = ( req, res ) => {
   })
 }
 
-module.exports.productArchive = ( req, res ) => {
+module.exports.archiveProduct = ( req, res ) => {
   let productID = req.params.productID;
 
   Product.findByIdAndUpdate( productID, { isActive: false }, { new: true } ).then( result => {
     if ( result ) {
       res.status( 200 ).send( result );
     } else {
-      res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+      res.status( 404 ).send( { error: `Product (${productID}) not found.` } );
     }
   })
   .catch( error => {
@@ -87,15 +93,26 @@ module.exports.productArchive = ( req, res ) => {
   })
 }
 
-module.exports.productUnarchive = ( req, res ) => {
+module.exports.unarchiveProduct = ( req, res ) => {
   let productID = req.params.productID;
 
   Product.findByIdAndUpdate( productID, { isActive: true }, { new: true } ).then( result => {
     if ( result ) {
       res.status( 200 ).send( result );
     } else {
-      res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+      res.status( 404 ).send( { error: `Product (${productID}) not found.` } );
     }
+  })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+  })
+}
+
+module.exports.deleteProduct = ( req, res ) => {
+  let productID = req.params.productID;
+
+  Product.findByIdAndDelete( productID ).then( result => {
+    res.status( 200 ).send( { success: `Product (${productID}) is now deleted.`, deleted: result } );
   })
   .catch( error => {
     res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );

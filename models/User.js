@@ -14,7 +14,19 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-
+  firstName: {
+    type: String
+  },
+  lastName: {
+    type: String
+  },
+  addressShipping: {
+    type: String
+  },
+  addressBilling: {
+    type: String
+  },
+  
   // Must be associated with:
   // A user who owns the order
   // Products that belong to the order 
