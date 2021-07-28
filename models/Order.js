@@ -32,8 +32,11 @@ const orderSchema = new mongoose.Schema({
         type: String,
         required: [true, "Product ID is required."]
       }
+
+      // probably better to add snapshot price here
     }
   ]
 });
+
 
 module.exports = mongoose.model("Order", orderSchema);

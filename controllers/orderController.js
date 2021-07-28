@@ -44,7 +44,7 @@ module.exports.createOrder = ( req, res ) => {
   let newOrder = new Order( req.body );
   console.log("[DEBUG] createOrder() newOrder", newOrder);
 
-  //  get buyer ID > update buyer ID
+  //  get requestor ID > update buyer ID
   let userData = auth.decode( req.headers.authorization );
   newOrder.buyerID = userData.id;
   
@@ -57,27 +57,29 @@ module.exports.createOrder = ( req, res ) => {
 
     // push this order _id to buyer.orders[]
     User.findByIdAndUpdate( newOrder.buyerID, { $push: { "orders": { orderID: saveResult._id } }}, { new: true } )
-
-    // get products list and get Total > update total amount
-    Promise.all(
-      newOrder.products.map( (productObj) => {
-        // push this order _id to product.orders[]
-        return Product.findByIdAndUpdate( productObj.productID, { $push: { "orders": { orderID: saveResult._id } }} ).then( foundProduct => {
-
-          return foundProduct.price; // mapping price for totals later
-        })
-      })
-    )
-    .then(( mappedPrices ) => { // mapped Promises resolved into mapped prices
-      newOrder.totalAmount = mappedPrices.reduce( (runningSum, currentPrice) => runningSum + currentPrice);
-      return newOrder.save();
-    })
     .then( result => {
-      res.status( 201 ).send( { success: " New order created. Records synced. ", result: result } );
-    })
-    .catch( error => {
-      res.status( 500 ).send({ error: "Internal server error. Cannot process your request." });
-    })
+
+      // get products list and get Total > update total amount
+      Promise.all(
+        newOrder.products.map( (productObj) => {
+          // push this order _id to product.orders[]
+          return Product.findByIdAndUpdate( productObj.productID, { $push: { "orders": { orderID: saveResult._id } }} ).then( foundProduct => {
+
+            return foundProduct.price; // mapping price for totals later
+          })
+        })
+      )
+      .then(( mappedPrices ) => { // mapped Promises resolved into mapped prices
+        newOrder.totalAmount = mappedPrices.reduce( (runningSum, currentPrice) => runningSum + currentPrice);
+        return newOrder.save();
+      })
+      .then( result => {
+        res.status( 201 ).send( { success: " New order created. Records synced. ", result: result } );
+      })
+      .catch( error => {
+        res.status( 500 ).send({ error: "Internal server error. Cannot process your request." });
+      })
+    });
   });
 }
 
