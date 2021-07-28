@@ -16,6 +16,8 @@ router.put("/:userID/makeAdmin", auth.verify, auth.requireAdmin, userController.
 
 module.exports = router;
 
+//version 2 coming
+
 /* 
   get /me ,logged in user 
   get /:userID, admin only

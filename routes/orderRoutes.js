@@ -5,7 +5,7 @@ const auth = require("../auth");
 
 router.get("/all", auth.verify, auth.requireAdmin, orderController.getAllOrders);
 router.get("/mine", auth.verify, orderController.getLoggedUserOrders); 
-router.post("/create", auth.verify, orderController.createOrder);
+router.post("/create", auth.verify, auth.requireNonAdmin, orderController.createOrder);
 router.get("/:orderID", auth.verify, orderController.getOrderDetails);
 router.delete("/:orderID", auth.verify, orderController.deleteOrder);
 

@@ -26,6 +26,15 @@ module.exports.requireAdmin = (req, res, next) => {
   }
 }
 
+module.exports.requireNonAdmin = (req, res, next) => {
+  if ( !req.isAdmin ) {
+    next();
+  } else {
+    res.status(403).send({ error: "This route is forbidden. Normal users only." });
+  }
+}
+
+
 // verify token
 module.exports.verify = (req, res, next) => {
   let token = req.headers.authorization;
