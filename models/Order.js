@@ -31,9 +31,19 @@ const orderSchema = new mongoose.Schema({
       productID: {
         type: String,
         required: [true, "Product ID is required."]
+      },
+      quantity: {
+        type: Number,
+        required: [true, "Product quantity is required."],
+        min: [1, "Minimum product quantity is 1."]
       }
-
+      
+      // ,
+      //
       // probably better to add snapshot price here
+      // snapPrice: {
+      //  type: Number 
+      // }
     }
   ]
 });

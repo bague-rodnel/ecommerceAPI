@@ -48,6 +48,7 @@ module.exports.verify = (req, res, next) => {
   			res.status(401).send({ error: "Authentication failed." });
         return false;
   		} else {
+        req.userID = decoded.id;
         req.isAdmin = decoded.isAdmin; // probably useful later
   			next(); 
   		}

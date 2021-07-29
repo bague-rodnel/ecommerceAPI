@@ -3,9 +3,17 @@ const router = express.Router();
 const orderController = require("../controllers/orderController");
 const auth = require("../auth");
 
-router.get("/all", auth.verify, auth.requireAdmin, orderController.getAllOrders);
-router.get("/mine", auth.verify, orderController.getLoggedUserOrders); 
-router.post("/create", auth.verify, auth.requireNonAdmin, orderController.createOrder);
+//- Retrieve all orders (Admin only)
+router.get("/", auth.verify, auth.requireAdmin, orderController.getAllOrders);
+
+// rerouted to user/myOrders
+// router.get("/mine", auth.verify, orderController.getLoggedUserOrders);  
+
+// rerouted to user/checkout
+// router.post("/create", auth.verify, auth.requireNonAdmin, orderController.createOrder);
+
+// this now serves as a helper route to get order details of a loggeduser
+// since /users/:orderID is admin only as per requirements
 router.get("/:orderID", auth.verify, orderController.getOrderDetails);
 router.delete("/:orderID", auth.verify, orderController.deleteOrder);
 

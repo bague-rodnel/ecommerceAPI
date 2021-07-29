@@ -7,14 +7,13 @@ this.findBySKU = ( thisSKU ) => {
   })
 };
 
-module.exports.getAllProducts = ( req, res ) => {
-  let showActiveOnly = true;
-
-  if (req.isAdmin && (req.body.isActive == "false") ) {
-    showActiveOnly = false;
-  }
-
-  Product.find( { isActive : showActiveOnly } ).then( ( result, error ) => {
+module.exports.getAllActiveProducts = ( req, res ) => {
+  // let showActiveOnly = true;
+  // if (req.isAdmin && (req.body.isActive == "false") ) {
+  //   showActiveOnly = false;
+  // }
+  // Product.find( { isActive : showActiveOnly } ).then( ( result, error ) => {
+  Product.find( { isActive : true } ).then( ( result, error ) => {
     if ( error ) {
       res.status( 500 ).send( { error: error } );
     } else {
@@ -66,16 +65,22 @@ module.exports.createProduct = ( req, res ) => {
 module.exports.updateProductByID = ( req, res ) => {
   let productID = req.params.productID;
 
-  Product.findByIdAndUpdate( productID, req.body, { new: true }).then( result => {
-    if ( result ) {
-      res.status( 200 ).send( result );
+  this.findBySKU( req.body.sku ).then ( foundProduct => {
+    if ( foundProduct && (foundProduct._id != productID) ) {
+      res.status( 409 ).send( { error: `Product SKU (${req.body.sku}) is already in use by product ID (${foundProduct._id}). Try another one.` });
     } else {
-      res.status( 404 ).send( { error: `Product (${productID}) not found.` } );
+      Product.findByIdAndUpdate( productID, req.body, { new: true }).then( result => {
+        if ( result ) {
+          res.status( 200 ).send( result );
+        } else {
+          res.status( 404 ).send( { error: `Product (${productID}) not found.` } );
+        }
+      })
+      .catch( error => {
+        res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+      })
     }
-  })
-  .catch( error => {
-    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
-  })
+  });
 }
 
 module.exports.archiveProduct = ( req, res ) => {

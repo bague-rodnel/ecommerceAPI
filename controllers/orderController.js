@@ -20,14 +20,14 @@ module.exports.getAllOrders = ( req, res ) => {
 // this method will only return the orderIDs
 // a separate /api/orders/:orderID will return the details
 module.exports.getLoggedUserOrders = ( req, res ) => {
-  let userData = auth.decode( req.headers.authorization );
+  //let userData = auth.decode( req.headers.authorization );
   let userOrders = [];
 
-  User.findById( userData.id ).then( foundUser => {
+  User.findById( req.userID ).then( foundUser => {
     if ( foundUser ) {
       res.status( 200 ).send( foundUser.orders );
     } else {
-      res.status( 404 ).send( { order: `User (${userData.id}) not found.` } );
+      res.status( 404 ).send( { order: `User (${req.userID}) not found.` } );
     }
   })
   .catch( error => {
@@ -45,8 +45,10 @@ module.exports.createOrder = ( req, res ) => {
   console.log("[DEBUG] createOrder() newOrder", newOrder);
 
   //  get requestor ID > update buyer ID
-  let userData = auth.decode( req.headers.authorization );
-  newOrder.buyerID = userData.id;
+  //let userData = auth.decode( req.headers.authorization );
+  //newOrder.buyerID = userData.id;
+  newOrder.buyerID = req.userID;
+
   
   // initialize totalAmount
   newOrder.totalAmount = 0;
@@ -65,7 +67,7 @@ module.exports.createOrder = ( req, res ) => {
           // push this order _id to product.orders[]
           return Product.findByIdAndUpdate( productObj.productID, { $push: { "orders": { orderID: saveResult._id } }} ).then( foundProduct => {
 
-            return foundProduct.price; // mapping price for totals later
+            return foundProduct.price * productObj.quantity; // mapping price for totals later
           })
         })
       )
