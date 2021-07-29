@@ -38,12 +38,13 @@ const orderSchema = new mongoose.Schema({
         min: [1, "Minimum product quantity is 1."]
       }
       
-      // ,
-      //
       // probably better to add snapshot price here
-      // snapPrice: {
-      //  type: Number 
-      // }
+      // this price is static and may vary from the current price
+      ,
+      purchasePrice: {
+        type: Number,
+        min: [0, "Price cannot be negative."]
+      }
     }
   ]
 });

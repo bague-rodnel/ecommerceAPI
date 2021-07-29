@@ -185,7 +185,7 @@ module.exports.deleteUser = ( req, res ) => {
 }
 
 module.exports.userCheckout = ( req, res ) => {
-  // scenario /api/orders/create post will have only the array of product IDs
+  // scenario /api/orders/create post will have only the array of { productID, quantity }
 
   let isOrderSaved, isBuyerLinked, isProductLinked = false;
   
@@ -215,6 +215,7 @@ module.exports.userCheckout = ( req, res ) => {
           // push this order _id to product.orders[]
           return Product.findByIdAndUpdate( productObj.productID, { $push: { "orders": { orderID: saveResult._id } }} ).then( foundProduct => {
 
+            productObj.purchasePrice = foundProduct.price;
             return foundProduct.price * productObj.quantity; // mapping price for totals later
           })
         })

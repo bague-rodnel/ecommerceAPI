@@ -36,20 +36,19 @@ module.exports.getLoggedUserOrders = ( req, res ) => {
 }
 
 module.exports.createOrder = ( req, res ) => {
-  // scenario /api/orders/create post will have only the array of product IDs
+  // scenario /api/orders/create post will have only the array of { productID, quantity}
 
   let isOrderSaved, isBuyerLinked, isProductLinked = false;
   
   // newOrder object created
   let newOrder = new Order( req.body );
-  console.log("[DEBUG] createOrder() newOrder", newOrder);
+  // console.log("[DEBUG] createOrder() newOrder", newOrder);
 
   //  get requestor ID > update buyer ID
   //let userData = auth.decode( req.headers.authorization );
   //newOrder.buyerID = userData.id;
   newOrder.buyerID = req.userID;
 
-  
   // initialize totalAmount
   newOrder.totalAmount = 0;
 
@@ -67,6 +66,7 @@ module.exports.createOrder = ( req, res ) => {
           // push this order _id to product.orders[]
           return Product.findByIdAndUpdate( productObj.productID, { $push: { "orders": { orderID: saveResult._id } }} ).then( foundProduct => {
 
+            newOrder.purchasePrice = foundProduct.price;
             return foundProduct.price * productObj.quantity; // mapping price for totals later
           })
         })
