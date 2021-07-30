@@ -100,46 +100,26 @@ module.exports.updateLoggedUserInfo = ( req, res ) => {
 }
 
 module.exports.getLoggedUserOrders = ( req, res ) => {
-  //let userData = auth.decode( req.headers.authorization );
-  // User.findById( req.userID )
-  // .populate({
-  //   path: "orders.order",
-  //   model: "Order",
-  //   select: "-buyer"
-  // })
-  // .populate({
-  //   path: "orders.order.products.product",
-  //   model: "Product"
-  // })
-  // .then( foundUser => {
-  //   if ( foundUser ) {
-  //     res.status( 200 ).send( foundUser.orders );
-  //   } else {
-  //     res.status( 404 ).send( { error: `User (${req.userID}) not found.` } );
-  //   }
-  // })
-  // .catch( error => {
-  //   res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
-  // })
-
-  Order.find( { buyer: req.userID }, 
-    {
-      "_id": "$_id",
-      "purchasedOn": "$purchasedOn",
-      "totalAmount": "$totalAmount",
-      "products": "$products"
-    }
-  )
+  User.findById( req.userID )
   .populate({
-    path: "products.product",
-    model: "Product",
-    select: "_id name sku description"
+    path: "orders.order",
+    model: "Order",
+    select: "-buyer",
+    populate: {
+      path: "products.product",
+      model: "Product",
+      select: "name sku description"
+    }
   })
-  .then( result => {
-    if ( result ) {
-      res.status( 200 ).send( result );
+  .then( foundUser => {
+    if ( foundUser ) {
+      if ( foundUser.orders ) {
+        res.status( 200 ).send( foundUser.orders );
+      } else {
+        res.status( 404 ).send( { error: `No orders by user (${req.userID}) found.` } );  
+      }
     } else {
-      res.status( 404 ).send( { error: "No orders found." } );
+      res.status( 404 ).send( { error: `User (${req.userID}) not found.` } );
     }
   })
   .catch( error => {
@@ -178,7 +158,6 @@ module.exports.updateUserByID = ( req, res ) => {
   })
 }
 
-// router.put("/:userID/setAsAdmin"
 module.exports.setAsAdmin = ( req, res ) => {
   let userID = req.params.userID;
 
@@ -209,9 +188,6 @@ module.exports.setAsNonAdmin = ( req, res ) => {
   })
 }
 
-
-
-
 module.exports.deleteUser = ( req, res ) => {
   let userID = req.params.userID;
 
@@ -230,15 +206,10 @@ module.exports.deleteUser = ( req, res ) => {
 module.exports.userCheckout = ( req, res ) => {
   // scenario /api/orders/create post will have only the array of { productID, quantity }
 
-  let isOrderSaved, isBuyerLinked, isProductLinked = false;
-  
   // newOrder object created
   let newOrder = new Order( req.body );
-  // console.log("[DEBUG] createOrder() newOrder", newOrder);
 
   //  get requestor ID > update buyer ID
-  //let userData = auth.decode( req.headers.authorization );
-  //newOrder.buyerID = userData.id;
   newOrder.buyer = req.userID;
   
   // initialize totalAmount

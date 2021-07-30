@@ -17,14 +17,8 @@ const userSchema = new mongoose.Schema({
   // Must be associated with:
   // A user who owns the order
   // Products that belong to the order 
-
   orders: [
     {
-      // orderID: {
-      //   type: String,
-      //   required: [true, "Order ID is required."]
-      // },
-
       order: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Order'
@@ -41,13 +35,22 @@ const userSchema = new mongoose.Schema({
   lastName: {
     type: String
   },
+  mobileNo: {
+    type: String
+  },
   addressShipping: {
     type: String
   },
   addressBilling: {
     type: String
   },
-
+  isSuspended: {
+    type: Boolean,
+    default: false
+  },
+  agreedTnC: {
+    type: Boolean
+  }
 });
 
 userSchema.pre('save', function(next) {

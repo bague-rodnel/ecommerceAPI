@@ -27,17 +27,11 @@ const productSchema = new mongoose.Schema({
     type: Date,
     default: new Date()
   },
-
   // Must be associated with:
   // A user who owns the order
   // Products that belong to the order 
   orders: [
     {
-      // order: {
-      //   type: String,
-      //   required: [true, "Order ID is required."]
-      // },
-      
       order: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Order'

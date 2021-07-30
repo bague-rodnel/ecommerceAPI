@@ -9,32 +9,15 @@ const orderSchema = new mongoose.Schema({
     type: Date,
     default: new Date()
   },
-  addressShippedTo: {
-    type: String
-  },
-  addressBilledTo: {
-    type: String
-  },
   // Must be associated with:
   // A user who owns the order
   // Products that belong to the order 
-
-  // only one buyer ID is needed 
-  // buyerID: {
-  //   type: String,
-  //   default: "-1"    // guest
-  // },
   buyer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
-  // array of product IDs
   products: [
     {
-      // productID: {
-      //   type: String,
-      //   required: [true, "Product ID is required."]
-      // },
       product: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Product', 
@@ -53,10 +36,19 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         min: [0, "Price cannot be negative."]
       },
-      
+
       _id: false
     }
-  ]
+  ],
+  addressShippedTo: {
+    type: String
+  },
+  addressBilledTo: {
+    type: String
+  },
+  couponCode: {
+    type: String
+  }
 });
 
 
