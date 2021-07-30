@@ -12,8 +12,8 @@ const auth = require("../auth");
 // rerouted to user/checkout
 // router.post("/create", auth.verify, auth.requireNonAdmin, orderController.createOrder);
 
-router.get("/:orderID", auth.verify, orderController.getOrderDetails);
-router.delete("/:orderID", auth.verify, orderController.deleteOrder);
+router.get("/:orderID", auth.verify, auth.requireAdmin, orderController.getOrderDetails);
+router.delete("/:orderID", auth.verify, auth.requireAdmin, orderController.deleteOrder);
 
 
 module.exports = router;
