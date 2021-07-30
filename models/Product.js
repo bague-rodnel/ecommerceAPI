@@ -33,10 +33,17 @@ const productSchema = new mongoose.Schema({
   // Products that belong to the order 
   orders: [
     {
-      orderID: {
-        type: String,
-        required: [true, "Order ID is required."]
-      }
+      // order: {
+      //   type: String,
+      //   required: [true, "Order ID is required."]
+      // },
+      
+      order: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order'
+      },
+
+      _id: false
     }
   ]
 });

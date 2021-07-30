@@ -16,6 +16,8 @@ router.get("/", productController.getAllActiveProducts);
 //   3. If validation successful, API creates product using the contents of the request body
 router.post("/", auth.verify, auth.requireAdmin, productController.createProduct);
 
+router.get("/all", auth.verify, auth.requireAdmin, productController.getAllProducts);
+
 // Retrieve Single Product router.get("/:productID...")
 //   1. A GET request is sent to the /products/:productId endpoint.
 //   2. API retrieves product that matches productId URL parameter and returns it in its response.

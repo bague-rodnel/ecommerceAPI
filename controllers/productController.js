@@ -13,11 +13,24 @@ module.exports.getAllActiveProducts = ( req, res ) => {
   //   showActiveOnly = false;
   // }
   // Product.find( { isActive : showActiveOnly } ).then( ( result, error ) => {
-  Product.find( { isActive : true } ).then( ( result, error ) => {
-    if ( error ) {
-      res.status( 500 ).send( { error: error } );
-    } else {
+  Product.find( { isActive : true } ).then( result  => {
+    if ( result ) {
       res.status( 200 ).send( result );
+    } else {
+      res.status( 404 ).send( { error: "No active product found." })
+    }
+  })
+  .catch( error => {
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+  })
+}
+
+module.exports.getAllProducts = ( req, res ) => {
+  Product.find( ).then( result  => {
+    if ( result ) {
+      res.status( 200 ).send( result );
+    } else {
+      res.status( 404 ).send( { error: "No active product found." })
     }
   })
   .catch( error => {
@@ -46,11 +59,9 @@ module.exports.createProduct = ( req, res ) => {
 
       let newProduct = new Product( req.body );
     
-      newProduct.save().then( ( result, err ) => {
-        if ( err ) {
-          res.status( 500 ).send( { error: err } );
-        } else {
-          res.status( 201 ).send( result );
+      newProduct.save().then( result => {
+        if ( result ) {
+          res.status( 201 ).send( { success: "New product added to records.", result: result } );
         }
       })
     } else {
@@ -71,7 +82,7 @@ module.exports.updateProductByID = ( req, res ) => {
     } else {
       Product.findByIdAndUpdate( productID, req.body, { new: true }).then( result => {
         if ( result ) {
-          res.status( 200 ).send( result );
+          res.status( 200 ).send( { success: `Product has been updated`, result: result } );
         } else {
           res.status( 404 ).send( { error: `Product (${productID}) not found.` } );
         }
@@ -88,7 +99,7 @@ module.exports.archiveProduct = ( req, res ) => {
 
   Product.findByIdAndUpdate( productID, { isActive: false }, { new: true } ).then( result => {
     if ( result ) {
-      res.status( 200 ).send( result );
+      res.status( 200 ).send( { success: `Product is now archived.`, result: result } );
     } else {
       res.status( 404 ).send( { error: `Product (${productID}) not found.` } );
     }
@@ -103,7 +114,7 @@ module.exports.unarchiveProduct = ( req, res ) => {
 
   Product.findByIdAndUpdate( productID, { isActive: true }, { new: true } ).then( result => {
     if ( result ) {
-      res.status( 200 ).send( result );
+      res.status( 200 ).send( { success: "Product is now unarchived", result: result } );
     } else {
       res.status( 404 ).send( { error: `Product (${productID}) not found.` } );
     }

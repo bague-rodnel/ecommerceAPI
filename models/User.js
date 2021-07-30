@@ -14,6 +14,27 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  // Must be associated with:
+  // A user who owns the order
+  // Products that belong to the order 
+
+  orders: [
+    {
+      // orderID: {
+      //   type: String,
+      //   required: [true, "Order ID is required."]
+      // },
+
+      order: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order'
+      },
+
+      _id: false
+      
+    }
+  ],
+  
   firstName: {
     type: String
   },
@@ -27,18 +48,6 @@ const userSchema = new mongoose.Schema({
     type: String
   },
 
-  // Must be associated with:
-  // A user who owns the order
-  // Products that belong to the order 
-
-  orders: [
-    {
-      orderID: {
-        type: String,
-        required: [true, "Order ID is required."]
-      }
-    }
-  ]
 });
 
 userSchema.pre('save', function(next) {

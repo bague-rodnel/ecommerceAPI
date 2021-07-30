@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const Product = require( "./../models/Product" );
 
 const orderSchema = new mongoose.Schema({
   totalAmount: {
@@ -21,16 +20,25 @@ const orderSchema = new mongoose.Schema({
   // Products that belong to the order 
 
   // only one buyer ID is needed 
-  buyerID: {
-    type: String,
-    default: "-1"    // guest
+  // buyerID: {
+  //   type: String,
+  //   default: "-1"    // guest
+  // },
+  buyer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   },
   // array of product IDs
   products: [
     {
-      productID: {
-        type: String,
-        required: [true, "Product ID is required."]
+      // productID: {
+      //   type: String,
+      //   required: [true, "Product ID is required."]
+      // },
+      product: {
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Product', 
+        required: true
       },
       quantity: {
         type: Number,
@@ -44,7 +52,9 @@ const orderSchema = new mongoose.Schema({
       purchasePrice: {
         type: Number,
         min: [0, "Price cannot be negative."]
-      }
+      },
+      
+      _id: false
     }
   ]
 });

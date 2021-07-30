@@ -37,6 +37,9 @@ router.delete("/:userID/", auth.verify, auth.requireAdmin, userController.delete
 //   2. API validates JWT, returns false if validation fails.
 //   3. If validation successful, API finds user with ID matching the userId URL parameter and sets its isAdmin property to true.
 router.put("/:userID/setAsAdmin", auth.verify, auth.requireAdmin, userController.setAsAdmin);
+router.put("/:userID/setAsNonAdmin", auth.verify, auth.requireAdmin, userController.setAsNonAdmin);
+
+
 
 module.exports = router;
 
