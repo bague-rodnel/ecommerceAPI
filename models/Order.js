@@ -32,7 +32,7 @@ const orderSchema = new mongoose.Schema({
       // probably better to add snapshot price here
       // this price is static and may vary from the current price
       ,
-      purchasePrice: {
+      unitPriceAtCheckout: {
         type: Number,
         min: [0, "Price cannot be negative."]
       },

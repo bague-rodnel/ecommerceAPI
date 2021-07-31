@@ -12,8 +12,6 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, useCr
 .then((result) => {
   if (result) {
     console.log('Connected to MongoDB database.');
-    app.listen(port, () => console.log(`Now listening on port ${port}`));
-
         
     //middlewares
     app.use(cors()); 
@@ -31,13 +29,6 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, useCr
     app.use("/api/products", productRoutes);
     app.use("/api/users", userRoutes);
 
-    // 200 0K
-    // 201 created
-    // 401 unauthorized, identity not confirmed
-    // 403 forbidden, not enough acess rights, identity known
-    // 404 not found
-    // 500 server error
-
     // app.get('/', (req, res) => {
     //   res.sendFile('/views/index.html', { root: __dirname });
     // })
@@ -46,6 +37,8 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, useCr
     // app.use((req, res) => {
     //   res.status(404).sendFile('./views/404.html', { root: __dirname });
     // });
+    
+    app.listen(port, () => console.log(`Now listening on port ${port}`));
   }
 })
 .catch((err) => console.log(err));

@@ -1,10 +1,14 @@
 const mongoose = require("mongoose");
+const bcrypt = require( "bcrypt" );
+const { isEmail } = require("validator");
 
 
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: [true, "Email is required"]
+    lowercase: true,
+    required: [true, "Email is required"],
+    validate: [isEmail, "Please eneter a valid email"]
   },
   password: {
     type: String,
@@ -55,10 +59,8 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre('save', function(next) {
   // override any attempt to make new user admin programmatically
-  // only ways to make user admin is through /setAdmin endpoint by a backdoor admin 
-  // or another admin previously appointed through the same endpoint 
-  // or else, manual database record edit
   this.isAdmin = false;
+  this.password = bcrypt.hashSync( req.body.password, 10 );
   next();
 });
 

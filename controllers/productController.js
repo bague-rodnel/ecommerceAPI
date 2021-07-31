@@ -78,7 +78,7 @@ module.exports.updateProductByID = ( req, res ) => {
 
   this.findBySKU( req.body.sku ).then ( foundProduct => {
     if ( foundProduct && (foundProduct._id != productID) ) {
-      res.status( 409 ).send( { error: `Product SKU (${req.body.sku}) is already in use by product ID (${foundProduct._id}). Try another one.` });
+      res.status( 409 ).send( { error: `Product SKU (${req.body.sku}) is already in use by product ID (${foundProduct._id}) "${foundProduct.name}". Try another one.` });
     } else {
       Product.findByIdAndUpdate( productID, req.body, { new: true }).then( result => {
         if ( result ) {
