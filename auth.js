@@ -1,13 +1,7 @@
 const jwt = require("jsonwebtoken");
 const secret = "CourseBookingAPI";
+//const secret = process.env.ACCESS_TOKEN_SECRET;
 
-// DEbugging
-module.exports.passCheck = ( req, res, next ) => {
-  console.log("[DEBUG], passed previous middleware()");
-  next();
-}
-
-// create token
 module.exports.createAccessToken = (user) => {
 	const data = {
 		id: user._id,
@@ -15,6 +9,9 @@ module.exports.createAccessToken = (user) => {
 		isAdmin: user.isAdmin
 	}
 
+  const options = {
+    expiresIn: '1h'
+  }
 	return jwt.sign(data, secret, {});
 };
 
@@ -34,13 +31,10 @@ module.exports.requireNonAdmin = (req, res, next) => {
   }
 }
 
-
-// verify token
 module.exports.verify = (req, res, next) => {
   let token = req.headers.authorization;
 
   if (typeof token != "undefined") {
-  	// token = token.slice(7, token.length); 
   	token = token.split(' ')[1];
 
   	return jwt.verify(token, secret, (err, decoded) => {
@@ -61,7 +55,6 @@ module.exports.verify = (req, res, next) => {
 
 module.exports.decode = (token) => {
 	if (typeof token !== "undefined") {
-		//token = token.slice(7, token.length); // remove 'Bearer' in authorization
 		token = token.split(' ')[1];
 
 		return jwt.verify(token, secret, (err, data) => {
@@ -70,13 +63,7 @@ module.exports.decode = (token) => {
 			} else {
 				let payload = jwt.decode(token, {complete: true}).payload;
 
-        // console.log("[DEBUG] auth.js > decode()");
-				// console.log(payload);
-
 				return payload;
-				// decode() decodes the token and gets the payload
-				// payload is the data from the token we initially
-				// created when we log in
 			}
 		});
 	} else {

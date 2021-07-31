@@ -43,15 +43,6 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, useCr
 })
 .catch((err) => console.log(err));
 
-//connect to database
-// mongoose.connect('mongodb+srv://rodnelb:toor@zuitt-bootcamp.pfukx.mongodb.net/ecommerce-api?retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true});
-
-//notification
-// const db = mongoose.connection;
-// db.on('error', console.error.bind(console, 'connection error:'));
-// db.once('open', function() {
-//   console.log(`We're connected to MongoDB Database`)
-// });
 
 
 

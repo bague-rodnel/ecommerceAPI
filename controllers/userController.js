@@ -2,7 +2,7 @@ const Order = require( "./../models/Order" );
 const Product = require( "./../models/Product" );
 const User = require( "./../models/User" );
 const auth = require( "../auth" );
-const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 
 //CHECK IF EMAIL EXISTS
@@ -21,14 +21,9 @@ module.exports.getAllUsers = ( req, res ) => {
     }
   })
   .catch( error => {
-    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request."  } );
   })
 }
-
-
-//REGISTER USER
-//to hash the password: https://www.npmjs.com/package/bcrypt
-//hashSync is a funtion of bcrypt that encrypts the password and the 10 is a number of times it runs the encryption
 
 module.exports.registerUser = ( req, res ) => {
   this.findByEmail( req.body.email ).then( foundUser => {
@@ -62,7 +57,7 @@ module.exports.loginUser = ( req, res ) => {
     }
   })
   .catch( error => {
-    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request.", details: error  } );
   })
 }
 
@@ -209,6 +204,7 @@ module.exports.userCheckout = async ( req, res ) => {
     let newOrderID = await newOrder.save(); //i could be wrong here
 
     // pull up unit price of product and map price*qty for final total
+    // will revisit this later for a more atomic operation in mongo
     let mappedPrices = await Promise.all(
       newOrder.products.map( (productObj) => {
         return Product.findById( productObj.product )
@@ -234,6 +230,7 @@ module.exports.userCheckout = async ( req, res ) => {
     res.status( 201 ).send( { success: "New order created. Records synced.", result: result } );
 
   } catch (error) {
+    // lacks cleanup work if the order doesn't fulfill since it's not atomic 
     res.status( 500 ).send({ error: "Internal server error. Cannot process your request." + error });
   }
 }
