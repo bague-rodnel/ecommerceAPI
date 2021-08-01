@@ -214,14 +214,15 @@ module.exports.userCheckout = async ( req, res ) => {
             _id: productObj.product,
             stock: { $gt: productObj.quantity }
           },
-          update: {
+          {
             $inc: {
-              stock: -productObj.quantity;
+              stock: -productObj.quantity
             },
             $push: {
               "orders": { order: newOrderID }
             }
-          })
+          }
+        )
         .then( foundProduct => {
           if ( foundProduct ) {
             productObj.unitPriceAtCheckout = foundProduct.price;

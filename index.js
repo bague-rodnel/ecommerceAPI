@@ -12,7 +12,6 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, useCr
 .then((result) => {
   if (result) {
     console.log('Connected to MongoDB database.');
-    redisServer.open((err) => {});
         
     //middlewares
     app.use(cors()); 
