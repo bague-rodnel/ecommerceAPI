@@ -204,19 +204,30 @@ module.exports.userCheckout = async ( req, res ) => {
     let newOrderID = await newOrder.save(); //i could be wrong here
 
     // pull up unit price of product and map price*qty for final total
+    // i probably need one traverse for making sure all products are still
+    // in the records and not deleted before checkout finishes
     // will revisit this later for a more atomic operation in mongo
     let mappedPrices = await Promise.all(
       newOrder.products.map( (productObj) => {
-        return Product.findById( productObj.product )
+        return Product.findOneAndUpdate( 
+          { 
+            _id: productObj.product,
+            stock: { $gt: productObj.quantity }
+          },
+          update: {
+            $inc: {
+              stock: -productObj.quantity;
+            },
+            $push: {
+              "orders": { order: newOrderID }
+            }
+          })
         .then( foundProduct => {
-          if (foundProduct.stock >= productObj.quantity) {
-            foundProduct.stock -= productObj.quantity;
-            foundProduct.orders.push(newOrderID);
-            foundProduct.save();
+          if ( foundProduct ) {
             productObj.unitPriceAtCheckout = foundProduct.price;
             return foundProduct.price * productObj.quantity; 
           } else {
-            throw new Error(`Not enough stock for product ID (${foundProduct._id})`);
+            throw new Error(`Not enough stock for product ID (${productObj.product})`);
           }
         })
       })
@@ -230,7 +241,11 @@ module.exports.userCheckout = async ( req, res ) => {
     res.status( 201 ).send( { success: "New order created. Records synced.", result: result } );
 
   } catch (error) {
-    // lacks cleanup work if the order doesn't fulfill since it's not atomic 
+    // lacks rollback work if the order doesn't fulfill since it's not atomic 
+    // index = get first index of mappedPrices element == null 
+    // undo $inc and $push while index-- > 0
+    // remove orderID from User.orders[];
+    // remove order from Orders
     res.status( 500 ).send({ error: "Internal server error. Cannot process your request." + error });
   }
 }

@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const orderRoutes = require("./routes/orderRoutes");
 const productRoutes = require("./routes/productRoutes");
 const userRoutes = require("./routes/userRoutes");
-const cors = require("cors"); // allow sites to connect to this server
+const cors = require("cors"); 
 const app = express();
 const port = process.env.PORT || 8000;
 
@@ -12,6 +12,7 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, useCr
 .then((result) => {
   if (result) {
     console.log('Connected to MongoDB database.');
+    redisServer.open((err) => {});
         
     //middlewares
     app.use(cors()); 
@@ -41,7 +42,10 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, useCr
     app.listen(port, () => console.log(`Now listening on port ${port}`));
   }
 })
-.catch((err) => console.log(err));
+.catch((err) =>  {
+  redisServer.close((err) => {});
+  console.log(err);
+});
 
 
 
