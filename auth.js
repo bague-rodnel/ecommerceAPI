@@ -1,8 +1,11 @@
 const jwt = require("jsonwebtoken");
 // const secret = "CourseBookingAPI";
+const secret = process.env.ACCESS_TOKEN_SECRET || '33bdfcd5ef87f17718134b04bc22ab66d41ca7d51e24c792850a91eadc26c214';
+const refresh = process.env.REFRESH_TOKEN_SECRET || 'eb49a9778f01c388250176733a9b5024557e5e168d6fcd05357f9f5d24a01375';
+
 
 module.exports.createAccessToken = (user) => {
-  const secret = process.env.ACCESS_TOKEN_SECRET || '33bdfcd5ef87f17718134b04bc22ab66d41ca7d51e24c792850a91eadc26c214';
+  // const secret = process.env.ACCESS_TOKEN_SECRET || '33bdfcd5ef87f17718134b04bc22ab66d41ca7d51e24c792850a91eadc26c214';
 	const data = {
 		id: user._id,
 		email: user.email,
@@ -16,7 +19,6 @@ module.exports.createAccessToken = (user) => {
 };
 
 // module.exports.createRefreshToken = (user) => {
-//   const secret = process.env.REFRESH_TOKEN_SECRET || 'eb49a9778f01c388250176733a9b5024557e5e168d6fcd05357f9f5d24a01375';
 // 	const data = {
 // 		id: user._id,
 // 		email: user.email,
