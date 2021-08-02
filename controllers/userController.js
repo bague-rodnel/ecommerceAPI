@@ -209,6 +209,7 @@ module.exports.userCheckout = async ( req, res ) => {
     // i probably need one traverse for making sure all products are still
     // in the records and not deleted before checkout finishes
     // explore database triggers
+    // Mongoose pre/post hooks would probably do the trick xD
     var mappedPrices = await Promise.all(
       newOrder.products.map( (productObj) => {
         return Product.findOneAndUpdate( 
@@ -246,6 +247,7 @@ module.exports.userCheckout = async ( req, res ) => {
   } catch (error) {
     // revisit 
     // explore database triggers
+    // Mongoose pre/post hooks would probably do the trick xD
     newOrder.products.forEach( productObj => {
       Product.findByIdAndUpdate( productObj.product,
         { $pull: { "orders" : { order: newOrderID } } }

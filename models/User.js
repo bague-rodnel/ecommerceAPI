@@ -34,19 +34,24 @@ const userSchema = new mongoose.Schema({
   ],
   
   firstName: {
-    type: String
+    type: String,
+    default: ""
   },
   lastName: {
-    type: String
+    type: String,
+    default: ""
   },
   mobileNo: {
-    type: String
+    type: String,
+    default: ""
   },
   addressShipping: {
-    type: String
+    type: String,
+    default: ""
   },
   addressBilling: {
-    type: String
+    type: String,
+    default: ""
   },
   isSuspended: {
     type: Boolean,

@@ -10,9 +10,15 @@ module.exports.getAllOrders = ( req, res ) => {
       "_id": "$_id",
       "purchasedOn": "$purchasedOn",
       "totalAmount": "$totalAmount",
+      "buyer": "$buyer",
       "products": "$products"
     }
   )
+  .populate({
+    path: "buyer",
+    model: "User",
+    select: "email"
+  })
   .populate({
     path: "products.product",
     model: "Product",

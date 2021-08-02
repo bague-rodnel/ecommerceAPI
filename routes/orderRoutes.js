@@ -4,7 +4,7 @@ const orderController = require("../controllers/orderController");
 const auth = require("../auth");
 
 //- Retrieve all orders (Admin only)
-// router.get("/", auth.verify, auth.requireAdmin, orderController.getAllOrders);
+router.get("/", auth.verify, auth.requireAdmin, orderController.getAllOrders);
 
 // rerouted to user/myOrders
 // router.get("/mine", auth.verify, orderController.getLoggedUserOrders);  
