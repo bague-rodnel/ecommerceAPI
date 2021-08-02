@@ -60,7 +60,7 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save', function(next) {
   // override any attempt to make new user admin programmatically
   this.isAdmin = false;
-  this.password = bcrypt.hashSync( req.body.password, 10 );
+  this.password = bcrypt.hashSync( this.password, 10 );
   next();
 });
 

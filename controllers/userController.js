@@ -28,8 +28,10 @@ module.exports.getAllUsers = ( req, res ) => {
 module.exports.registerUser = ( req, res ) => {
   this.findByEmail( req.body.email ).then( foundUser => {
     if ( !foundUser ) {
+
       let newUser = new User( req.body );
 
+      console.log(`newUser: ${newUser}`);
       return newUser.save().then( result => {
         result.password = "********";
         res.status( 201 ).send( { success: `New user registered.`, result: result } );
@@ -39,7 +41,7 @@ module.exports.registerUser = ( req, res ) => {
     }
   })
   .catch( error => {
-    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." + error } );
   })
 }
 
@@ -196,18 +198,18 @@ module.exports.userCheckout = async ( req, res ) => {
   // scenario /api/orders/create post will have only the array of { productID, quantity }
   try {
     // newOrder object created
-    let newOrder = new Order( req.body );
+    var newOrder = new Order( req.body );
 
     newOrder.buyer = req.userID;
     newOrder.totalAmount = 0;
 
-    let newOrderID = await newOrder.save(); //i could be wrong here
+    var newOrderID = await newOrder.save(); //i could be wrong here
 
     // pull up unit price of product and map price*qty for final total
     // i probably need one traverse for making sure all products are still
     // in the records and not deleted before checkout finishes
-    // will revisit this later for a more atomic operation in mongo
-    let mappedPrices = await Promise.all(
+    // explore database triggers
+    var mappedPrices = await Promise.all(
       newOrder.products.map( (productObj) => {
         return Product.findOneAndUpdate( 
           { 
@@ -242,11 +244,19 @@ module.exports.userCheckout = async ( req, res ) => {
     res.status( 201 ).send( { success: "New order created. Records synced.", result: result } );
 
   } catch (error) {
-    // lacks rollback work if the order doesn't fulfill since it's not atomic 
-    // index = get first index of mappedPrices element == null 
-    // undo $inc and $push while index-- > 0
-    // remove orderID from User.orders[];
-    // remove order from Orders
+    // revisit 
+    // explore database triggers
+    newORder.products.forEach( productObj => {
+      Product.findByIdAndUpdate( productObj.product,
+        { $pull: { "orders" : { order: newOrderID } } }
+      )
+    })
+    
+    User.findByIdAndUpdate( req.userID,
+      { $pull: { "orders" : { order: newOrderID } } }
+    )
+    Order.findByIdAndDelete( newOrderID );
+
     res.status( 500 ).send({ error: "Internal server error. Cannot process your request." + error });
   }
 }
