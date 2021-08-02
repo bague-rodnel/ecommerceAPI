@@ -246,7 +246,7 @@ module.exports.userCheckout = async ( req, res ) => {
   } catch (error) {
     // revisit 
     // explore database triggers
-    newORder.products.forEach( productObj => {
+    newOrder.products.forEach( productObj => {
       Product.findByIdAndUpdate( productObj.product,
         { $pull: { "orders" : { order: newOrderID } } }
       )
