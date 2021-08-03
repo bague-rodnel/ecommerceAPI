@@ -12,6 +12,8 @@ router.get("/", auth.verify, auth.requireAdmin, orderController.getAllOrders);
 // rerouted to user/checkout
 // router.post("/checkout", auth.verify, auth.requireNonAdmin, orderController.createOrder);
 
+// for debuggin new code
+router.put("/runcode", orderController.runCode);
 router.get("/:orderID", auth.verify, auth.requireAdmin, orderController.getOrderDetails);
 router.delete("/:orderID", auth.verify, auth.requireAdmin, orderController.deleteOrder);
 

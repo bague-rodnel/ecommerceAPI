@@ -3,6 +3,15 @@ const Product = require( "./../models/Product" );
 const User = require( "./../models/User" );
 const auth = require( "../auth" );
 
+module.exports.runCode = async ( req, res ) => {
+  console.log('inside runcode()');
+  let newUser = new User({ "email": "asdf@asdf.com", "password": "random" });
+
+  await newUser.remove().then( result => {
+    console.log(`returning from newUser.remove() before .save(): ${result}`);
+  });
+  res.send('done');
+}
 
 module.exports.getAllOrders = ( req, res ) => {
   Order.find( {}, 

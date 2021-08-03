@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const User = require("./User")
+const Product = require("./Product")
 
 const orderSchema = new mongoose.Schema({
   totalAmount: {
@@ -51,5 +53,62 @@ const orderSchema = new mongoose.Schema({
   }
 });
 
+
+orderSchema.pre("remove", function() { 
+  let orderID =  this._id;
+  console.log(`inside .pre(remove) orderID: ${orderID}`);
+  User.updateMany( 
+    { "orders.order": orderID },   
+    { $pull: { "orders": { order: orderID } } },
+    { multi: true },
+    (error, writeOpResult) => { } // only works if there is a cb fn weird
+  );
+
+  Product.updateMany(
+    { "orders.order": orderID },   
+    { $pull: { "orders": { order: orderID } } },
+    { multi: true },
+    (error, writeOpResult) => { } // only works if there is a cb fn weird
+  ); 
+})
+
+orderSchema.pre("save", async function(next) {
+  let newOrderID = this._id;
+
+  await User.findByIdAndUpdate( this.buyer, 
+    { $push: { "orders": { order: newOrderID } }}, 
+    { new: true } 
+  );
+
+  var mappedPrices = await Promise.all(
+    this.products.map( (productObj) => {
+      return Product.findOneAndUpdate( 
+        { 
+          _id: productObj.product,
+          stock: { $gt: productObj.quantity }
+        },
+        {
+          $inc: {
+            stock: -productObj.quantity
+          },
+          $push: {
+            "orders": { order: newOrderID }
+          }
+        }
+      )
+      .then( foundProduct => {
+        if ( foundProduct ) {
+          productObj.unitPriceAtCheckout = foundProduct.price;
+          return foundProduct.price * productObj.quantity; 
+        } else {
+          throw new Error(`Not enough stock for product ID (${productObj.product})`);
+        }
+      })
+    })
+  )
+  this.totalAmount = mappedPrices.reduce( (runningSum, currentPrice) => runningSum + currentPrice);
+
+  next();
+});
 
 module.exports = mongoose.model("Order", orderSchema);

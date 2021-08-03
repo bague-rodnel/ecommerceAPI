@@ -41,7 +41,7 @@ module.exports.registerUser = ( req, res ) => {
     }
   })
   .catch( error => {
-    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." + error } );
+    res.status( 500 ).send( { error: "Internal Server Error: Cannot process your request." } );
   })
 }
 
@@ -196,70 +196,25 @@ module.exports.deleteUser = ( req, res ) => {
 
 module.exports.userCheckout = async ( req, res ) => {
   // scenario /api/orders/create post will have only the array of { productID, quantity }
+
   try {
-    // newOrder object created
+    // throw new Error("testing catch block");
+    // var allows reference inside catch block
     var newOrder = new Order( req.body );
 
     newOrder.buyer = req.userID;
     newOrder.totalAmount = 0;
 
-    var newOrderID = await newOrder.save(); //i could be wrong here
-
-    // pull up unit price of product and map price*qty for final total
-    // i probably need one traverse for making sure all products are still
-    // in the records and not deleted before checkout finishes
-    // explore database triggers
-    // Mongoose pre/post hooks would probably do the trick xD
-    var mappedPrices = await Promise.all(
-      newOrder.products.map( (productObj) => {
-        return Product.findOneAndUpdate( 
-          { 
-            _id: productObj.product,
-            stock: { $gt: productObj.quantity }
-          },
-          {
-            $inc: {
-              stock: -productObj.quantity
-            },
-            $push: {
-              "orders": { order: newOrderID }
-            }
-          }
-        )
-        .then( foundProduct => {
-          if ( foundProduct ) {
-            productObj.unitPriceAtCheckout = foundProduct.price;
-            return foundProduct.price * productObj.quantity; 
-          } else {
-            throw new Error(`Not enough stock for product ID (${productObj.product})`);
-          }
-        })
-      })
-    )
-    newOrder.totalAmount = mappedPrices.reduce( (runningSum, currentPrice) => runningSum + currentPrice);
-
-    // push this newOrderID to User.orders[]
-    await User.findByIdAndUpdate( req.userID, { $push: { "orders": { order: newOrderID } }}, { new: true } );
-
     let result = await newOrder.save();
+
     res.status( 201 ).send( { success: "New order created. Records synced.", result: result } );
 
   } catch (error) {
-    // revisit 
-    // explore database triggers
-    // Mongoose pre/post hooks would probably do the trick xD
-    newOrder.products.forEach( productObj => {
-      Product.findByIdAndUpdate( productObj.product,
-        { $pull: { "orders" : { order: newOrderID } } }
-      )
-    })
-    
-    User.findByIdAndUpdate( req.userID,
-      { $pull: { "orders" : { order: newOrderID } } }
-    )
-    Order.findByIdAndDelete( newOrderID );
+    // important that this is a doc.remove() and not Model.remove();
+    // otherwise pre hook will not fire
+    newOrder.remove();
 
-    res.status( 500 ).send({ error: "Internal server error. Cannot process your request." + error });
+    res.status( 500 ).send({ error: "Internal server error. Cannot process your request." });
   }
 }
 
