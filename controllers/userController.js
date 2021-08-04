@@ -203,7 +203,7 @@ module.exports.userCheckout = async ( req, res ) => {
     var newOrder = new Order( req.body );
 
     newOrder.buyer = req.userID;
-    newOrder.totalAmount = 0;
+    newOrder.totalAmount = 0; // see Order.js
 
     let result = await newOrder.save();
 

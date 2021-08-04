@@ -4,7 +4,12 @@ const orderRoutes = require("./routes/orderRoutes");
 const productRoutes = require("./routes/productRoutes");
 const userRoutes = require("./routes/userRoutes");
 const cors = require("cors"); 
+const env = require("dotenv");
 const app = express();
+
+// environment variables; 
+env.config();
+
 const port = process.env.PORT || 8000;
 
 const dbURI = 'mongodb+srv://rodnelb:toor@zuitt-bootcamp.pfukx.mongodb.net/ecommerce-api?retryWrites=true&w=majority';
