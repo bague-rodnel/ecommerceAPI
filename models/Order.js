@@ -10,6 +10,11 @@ const orderSchema = new mongoose.Schema({
   purchasedOn: {
     type: Date,
     default: new Date()
+  }, 
+  status: {
+    type: String,
+    default: 'processing',
+    enum: ['processing', 'paid', 'shipped', 'delivered']
   },
   // Must be associated with:
   // A user who owns the order
@@ -42,33 +47,71 @@ const orderSchema = new mongoose.Schema({
       _id: false
     }
   ],
-  addressShippedTo: {
-    type: String
+  deliveredAt: {
+    type: Date
   },
-  addressBilledTo: {
-    type: String
+  shippingInfo: {
+    address: {
+      type: String,
+      required: true,
+    },
+    city: {
+      type: String,
+      required: true,
+    },
+    phoneNo: {
+      type: String,
+      required: true,
+    },
+    postalCode: {
+      type: String,
+      required: true,
+    },
+    country: {
+      type: String,
+      required: true,
+    },
   },
-  couponCode: {
-    type: String
-  }
+  paymentInfo: {
+    id: {
+      type: String
+    },
+    status: {
+      type: String
+    }
+  },
+  itemsTotal: {
+    type: Number,
+    required: true,
+    default: 0.0
+  },
+  taxPrice: {
+    type: Number,
+    required: true,
+    default: 0.0
+  },
+  shippingPrice: {
+    type: Number,
+    required: true,
+    default: 0.0
+  },
 });
 
 
 orderSchema.pre("remove", function() { 
   let orderID =  this._id;
-  console.log(`inside .pre(remove) orderID: ${orderID}`);
   User.updateMany( 
     { "orders.order": orderID },   
     { $pull: { "orders": { order: orderID } } },
     { multi: true },
-    (error, writeOpResult) => { } // only works if there is a cb fn weird
+    (error, writeOpResult) => { } 
   );
 
   Product.updateMany(
     { "orders.order": orderID },   
     { $pull: { "orders": { order: orderID } } },
     { multi: true },
-    (error, writeOpResult) => { } // only works if there is a cb fn weird
+    (error, writeOpResult) => { } 
   ); 
 })
 
@@ -108,6 +151,10 @@ orderSchema.pre("save", async function(next) {
   )
   this.totalAmount = mappedPrices.reduce( (runningSum, currentPrice) => runningSum + currentPrice);
 
+// const foundVariant = await Product.findOne({
+//                               _id: req.params.productID, 
+//                               "variants.sku": req.params.sku })
+//                               .select("variants.$ -_id");
   next();
 });
 

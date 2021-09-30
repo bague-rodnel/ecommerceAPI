@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router(); 
 const orderController = require("../controllers/orderController");
-const auth = require("../auth");
+const auth = require("../middlewares/auth");
 
 //- Retrieve all orders (Admin only)
 router.get("/", auth.verify, auth.requireAdmin, orderController.getAllOrders);

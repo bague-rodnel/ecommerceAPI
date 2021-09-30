@@ -34,3 +34,23 @@ Order
     A user who owns the order
     Products that belong to the order 
 
+
+changes:
+  User Model:
+    isAdmin added:
+      change all logic relying on role: "admin" accordingly
+
+  Product Model:
+    isActive added:
+      change all get http logic to only show active products as needed
+
+  Order Model:
+    createdAt --> purchasedOn:
+      change references to createdAt to purchasedOn accordingly
+
+  change routing from /api/v1 to be mroe consistent with cap2 routing
+
+  ISSUES:
+    stocks going -1 for products i process payments for
+    rating going Infinity for products I have added raviews for
+    611f3f38efae4438bc044875 product has "user" added to when the product was ordered?
